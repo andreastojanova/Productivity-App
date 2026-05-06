@@ -35,7 +35,6 @@ import { ref, computed, onUnmounted } from 'vue';
 
 const emit = defineEmits(['session-completed']);
 
-// 1. Configuration (Removed 5/1)
 const presets = [
   { work: 25, shortBreak: 5, longBreak: 15 },
   { work: 30, shortBreak: 10, longBreak: 20 },
@@ -43,19 +42,18 @@ const presets = [
 ];
 
 const selectedPresetIndex = ref(0);
-const mode = ref('work'); // 'work' or 'shortBreak'
+const mode = ref('work');
 const isRunning = ref(false);
 const timeLeft = ref(presets[0].work * 60);
 let timerInterval = null;
 
-// 2. Computed
-const displayTime = computed(() => {
+  const displayTime = computed(() => {
   const minutes = Math.floor(timeLeft.value / 60);
   const seconds = timeLeft.value % 60;
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 });
 
-// 3. Logic
+
 const toggleTimer = () => {
   if (isRunning.value) pauseLogic();
   else startLogic();
@@ -67,7 +65,7 @@ const startLogic = () => {
     if (timeLeft.value > 0) {
       timeLeft.value--;
     } else {
-      handleTransition(); // Automatic switch
+      handleTransition();
     }
   }, 1000);
 };
@@ -81,14 +79,14 @@ const pauseLogic = () => {
 const handleTransition = () => {
   pauseLogic();
 
-  // Notify stats before switching
+
   emit('session-completed', {
     type: mode.value,
     duration: presets[selectedPresetIndex.value][mode.value],
     timestamp: new Date().toISOString()
   });
 
-  // AUTO-SWITCH LOGIC
+
   if (mode.value === 'work') {
     mode.value = 'shortBreak';
     alert("Work session done! Starting your break now.");
@@ -97,7 +95,7 @@ const handleTransition = () => {
     alert("Break is over! Time to focus.");
   }
 
-  // Update time and restart automatically
+
   timeLeft.value = presets[selectedPresetIndex.value][mode.value] * 60;
   startLogic();
 };

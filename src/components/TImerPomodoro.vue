@@ -56,7 +56,7 @@ import { ref, computed, onUnmounted } from 'vue';
 
 const emit = defineEmits(['session-completed']);
 
-// Листа на можни конфигурации (Presets)
+
 const presets = [
   { work: 25, shortBreak: 5, longBreak: 15 },
   { work: 30, shortBreak: 10, longBreak: 20 },
@@ -69,7 +69,7 @@ const mode = ref('work');
 const isRunning = ref(false);
 let timerInterval = null;
 
-// Пресметување на секунди врз основа на избраниот Preset и Режим
+
 const currentDuration = computed(() => {
   const preset = presets[selectedPresetIndex.value];
   return preset[mode.value] * 60;
@@ -77,14 +77,14 @@ const currentDuration = computed(() => {
 
 const timeLeft = ref(currentDuration.value);
 
-// Форматирање (MM:SS)
+
 const displayTime = computed(() => {
   const minutes = Math.floor(timeLeft.value / 60);
   const seconds = timeLeft.value % 60;
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 });
 
-// Функција за избор на сет (25/5, 30/10 итн.)
+
 const selectPreset = (index) => {
   if (isRunning.value && !confirm("Session in progress. Switch preset?")) return;
   selectedPresetIndex.value = index;
