@@ -28,17 +28,20 @@
       <button @click="resetTimer">RESET</button>
     </div>
   </div>
+
+  <div id="stats">
+    <UserStats :history="allSessions" @clear-history="clearHistory" />
+  </div>
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from 'vue';
-
-const emit = defineEmits(['session-completed']);
+import {ref, computed, onUnmounted, onMounted} from 'vue';
+import UserStats from "./components/UserStats.vue";
 
 const presets = [
-  { work: 25, shortBreak: 5, longBreak: 15 },
-  { work: 30, shortBreak: 10, longBreak: 20 },
-  { work: 50, shortBreak: 10, longBreak: 30 }
+  {work: 25, shortBreak: 5, longBreak: 15},
+  {work: 30, shortBreak: 10, longBreak: 20},
+  {work: 50, shortBreak: 10, longBreak: 30}
 ];
 
 const selectedPresetIndex = ref(0);
@@ -47,12 +50,11 @@ const isRunning = ref(false);
 const timeLeft = ref(presets[0].work * 60);
 let timerInterval = null;
 
-  const displayTime = computed(() => {
+const displayTime = computed(() => {
   const minutes = Math.floor(timeLeft.value / 60);
   const seconds = timeLeft.value % 60;
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 });
-
 
 const toggleTimer = () => {
   if (isRunning.value) pauseLogic();
@@ -79,13 +81,12 @@ const pauseLogic = () => {
 const handleTransition = () => {
   pauseLogic();
 
-
-  emit('session-completed', {
+  // ✅ Call updateStats directly (emit was going nowhere in App.vue)
+  updateStats({
     type: mode.value,
     duration: presets[selectedPresetIndex.value][mode.value],
     timestamp: new Date().toISOString()
   });
-
 
   if (mode.value === 'work') {
     mode.value = 'shortBreak';
@@ -94,7 +95,6 @@ const handleTransition = () => {
     mode.value = 'work';
     alert("Break is over! Time to focus.");
   }
-
 
   timeLeft.value = presets[selectedPresetIndex.value][mode.value] * 60;
   startLogic();
@@ -112,19 +112,63 @@ const resetTimer = () => {
 };
 
 onUnmounted(() => pauseLogic());
+
+// --- Session history ---
+const allSessions = ref([]);
+
+const updateStats = (data) => {
+  allSessions.value.unshift(data);
+  localStorage.setItem('pomodoro-history', JSON.stringify(allSessions.value));
+};
+
+const clearHistory = () => {
+  allSessions.value = [];
+  localStorage.removeItem('pomodoro-history');
+};
+
+onMounted(() => {
+  const saved = localStorage.getItem('pomodoro-history');
+  if (saved) allSessions.value = JSON.parse(saved);
+});
 </script>
 
 <style scoped>
-
-
 .pomodoro-wrapper {
   text-align: center;
   font-family: sans-serif;
   padding: 20px;
 }
-.presets button { margin: 5px; padding: 5px 10px; cursor: pointer; }
-.active { background: #333; color: white; }
-.active-mode { font-weight: bold; color: #ff4757; text-decoration: underline; }
-.timer-display h1 { font-size: 4rem; margin: 20px 0; }
-.controls button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+
+.presets button {
+  margin: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.active {
+  background: #333;
+  color: white;
+}
+
+.active-mode {
+  font-weight: bold;
+  color: #ff4757;
+  text-decoration: underline;
+}
+
+.timer-display h1 {
+  font-size: 4rem;
+  margin: 20px 0;
+}
+
+.controls button {
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+#stats {
+  max-width: 480px;
+  margin: 0 auto;
+}
 </style>
