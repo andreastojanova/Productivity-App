@@ -1,42 +1,51 @@
 <template>
-  <div class="pomodoro-wrapper">
-    <div class="presets">
-      <button
-          v-for="(preset, index) in presets"
-          :key="index"
-          :class="{ active: selectedPresetIndex === index }"
-          @click="selectPreset(index)"
-      >
-        {{ preset.work }}:{{ preset.shortBreak }}
-      </button>
+  <div class="min-h-screen bg-slate-100 flex flex-col items-center p-4 gap-6">
+
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 text-center">
+
+      <div class="flex gap-2 justify-center mb-4 flex-wrap">
+        <button v-for="(preset, index) in presets" :key="index" @click="selectPreset(index)" class="px-3 py-1 rounded-full text-sm border transition" :class="selectedPresetIndex === index ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-gray-100 text-gray-600 border-gray-200'" >
+          {{ preset.work }}:{{ preset.shortBreak }}
+        </button>
+      </div>
+
+      <div class="text-sm text-gray-500 mb-4">
+        <span :class="mode === 'work' ? 'text-indigo-600 font-semibold' : ''">Work</span>
+        <span class="mx-2">|</span>
+        <span :class="mode === 'shortBreak' ? 'text-indigo-600 font-semibold' : ''">Break</span>
+      </div>
+
+      <h1 class="text-5xl font-bold text-gray-800 mb-6">
+        {{ displayTime }}
+      </h1>
+
+      <div class="flex gap-3 justify-center">
+        <button @click="toggleTimer" class="px-5 py-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition">
+          {{ isRunning ? 'PAUSE' : 'START' }}
+        </button>
+
+        <button @click="resetTimer" class="px-5 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition">
+          RESET
+        </button>
+      </div>
+
     </div>
 
-    <div class="mode-indicator">
-      <span :class="{ 'active-mode': mode === 'work' }">Work</span>
-      <span> | </span>
-      <span :class="{ 'active-mode': mode === 'shortBreak' }">Break</span>
+    <div class="w-full max-w-md">
+      <UserStats :history="allSessions" @clear-history="clearHistory" />
     </div>
 
-    <div class="timer-display">
-      <h1>{{ displayTime }}</h1>
+    <div class="w-full max-w-md">
+      <TodoList />
     </div>
 
-    <div class="controls">
-      <button @click="toggleTimer">
-        {{ isRunning ? 'PAUSE' : 'START' }}
-      </button>
-      <button @click="resetTimer">RESET</button>
-    </div>
-  </div>
-
-  <div id="stats">
-    <UserStats :history="allSessions" @clear-history="clearHistory" />
   </div>
 </template>
 
 <script setup>
 import {ref, computed, onUnmounted, onMounted} from 'vue';
 import UserStats from "./components/UserStats.vue";
+import TodoList from "./components/TodoList.vue";
 
 const presets = [
   {work: 25, shortBreak: 5, longBreak: 15},
@@ -81,7 +90,6 @@ const pauseLogic = () => {
 const handleTransition = () => {
   pauseLogic();
 
-  // ✅ Call updateStats directly (emit was going nowhere in App.vue)
   updateStats({
     type: mode.value,
     duration: presets[selectedPresetIndex.value][mode.value],
@@ -113,7 +121,6 @@ const resetTimer = () => {
 
 onUnmounted(() => pauseLogic());
 
-// --- Session history ---
 const allSessions = ref([]);
 
 const updateStats = (data) => {
@@ -131,44 +138,3 @@ onMounted(() => {
   if (saved) allSessions.value = JSON.parse(saved);
 });
 </script>
-
-<style scoped>
-.pomodoro-wrapper {
-  text-align: center;
-  font-family: sans-serif;
-  padding: 20px;
-}
-
-.presets button {
-  margin: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.active {
-  background: #333;
-  color: white;
-}
-
-.active-mode {
-  font-weight: bold;
-  color: #ff4757;
-  text-decoration: underline;
-}
-
-.timer-display h1 {
-  font-size: 4rem;
-  margin: 20px 0;
-}
-
-.controls button {
-  padding: 10px 20px;
-  margin: 5px;
-  cursor: pointer;
-}
-
-#stats {
-  max-width: 480px;
-  margin: 0 auto;
-}
-</style>

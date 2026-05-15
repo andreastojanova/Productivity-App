@@ -1,73 +1,101 @@
 <template>
-  <div class="stats-container">
-    <h2 class="stats-title">Session Stats</h2>
+  <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-5">
 
-    <!-- Summary Cards -->
-    <div class="summary-grid">
-      <div class="stat-card">
-        <span class="stat-value">{{ totalSessions }}</span>
-        <span class="stat-label">Total Sessions</span>
+    <h2 class="text-center text-lg font-semibold text-gray-700 mb-4 uppercase tracking-wider">
+      Session Stats
+    </h2>
+
+    <div class="grid grid-cols-2 gap-3 mb-5">
+
+      <div class="bg-gray-50 border rounded-xl p-4 text-center">
+        <div class="text-2xl font-bold text-indigo-500">{{ totalSessions }}</div>
+        <div class="text-xs text-gray-400 mt-1">Total Sessions</div>
       </div>
-      <div class="stat-card accent">
-        <span class="stat-value">{{ workSessions }}</span>
-        <span class="stat-label">Work Sessions</span>
+
+      <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-center">
+        <div class="text-2xl font-bold text-indigo-600">{{ workSessions }}</div>
+        <div class="text-xs text-gray-400 mt-1">Work Sessions</div>
       </div>
-      <div class="stat-card">
-        <span class="stat-value">{{ breakSessions }}</span>
-        <span class="stat-label">Breaks Taken</span>
+
+      <div class="bg-gray-50 border rounded-xl p-4 text-center">
+        <div class="text-2xl font-bold text-emerald-500">{{ breakSessions }}</div>
+        <div class="text-xs text-gray-400 mt-1">Breaks</div>
       </div>
-      <div class="stat-card accent">
-        <span class="stat-value">{{ totalFocusMinutes }}<small>m</small></span>
-        <span class="stat-label">Focus Time</span>
+
+      <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4 text-center">
+        <div class="text-2xl font-bold text-indigo-600">
+          {{ totalFocusMinutes }}<span class="text-sm font-normal">m</span>
+        </div>
+        <div class="text-xs text-gray-400 mt-1">Focus Time</div>
       </div>
+
     </div>
 
-    <!-- Today vs All Time Toggle -->
-    <div class="filter-tabs">
-      <button :class="{ active: filter === 'today' }" @click="filter = 'today'">Today</button>
-      <button :class="{ active: filter === 'all' }" @click="filter = 'all'">All Time</button>
+    <div class="flex gap-2 mb-4">
+      <button @click="filter = 'today'" class="flex-1 py-2 rounded-lg text-sm transition" :class="filter === 'today' ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600'" >
+        Today
+      </button>
+
+      <button @click="filter = 'all'" class="flex-1 py-2 rounded-lg text-sm transition" :class="filter === 'all' ? 'bg-indigo-500 text-white' : 'bg-gray-100 text-gray-600'" >
+        All Time
+      </button>
     </div>
 
-    <!-- Filtered Stats -->
-    <div class="filtered-stats">
-      <div class="filtered-row">
-        <span>Work sessions</span>
-        <strong>{{ filteredWorkSessions }}</strong>
+    <div class="bg-gray-50 border rounded-xl p-4 mb-5 space-y-3">
+
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-500">Work sessions</span>
+        <strong class="text-indigo-500">{{ filteredWorkSessions }}</strong>
       </div>
-      <div class="filtered-row">
-        <span>Break sessions</span>
-        <strong>{{ filteredBreakSessions }}</strong>
+
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-500">Break sessions</span>
+        <strong class="text-emerald-500">{{ filteredBreakSessions }}</strong>
       </div>
-      <div class="filtered-row">
-        <span>Focus time</span>
-        <strong>{{ filteredFocusMinutes }} min</strong>
+
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-500">Focus time</span>
+        <strong class="text-indigo-500">{{ filteredFocusMinutes }} min</strong>
       </div>
+
     </div>
 
-    <!-- Session History -->
-    <div class="history-section">
-      <h3>Recent Sessions</h3>
-      <div v-if="history.length === 0" class="empty-state">
+    <div>
+      <h3 class="text-xs uppercase tracking-wider text-gray-400 mb-3">
+        Recent Sessions
+      </h3>
+
+      <div v-if="history.length === 0" class="text-center text-gray-400 text-sm py-4">
         No sessions yet. Start your first Pomodoro!
       </div>
-      <ul v-else class="history-list">
-        <li
-            v-for="(session, index) in recentHistory"
-            :key="index"
-            :class="['history-item', session.type === 'work' ? 'work' : 'break']"
-        >
-          <span class="session-badge">{{ session.type === 'work' ? '🍅' : '☕' }}</span>
-          <span class="session-type">{{ session.type === 'work' ? 'Work' : 'Break' }}</span>
-          <span class="session-duration">{{ session.duration }} min</span>
-          <span class="session-time">{{ formatTime(session.timestamp) }}</span>
+
+      <ul v-else class="space-y-2">
+
+        <li v-for="(session, index) in recentHistory" :key="index" class="flex items-center justify-between p-3 rounded-xl border bg-gray-50" :class="session.type === 'work' ? 'border-indigo-100' : 'border-emerald-100'" >
+
+          <div class="flex items-center gap-2">
+            <span class="text-lg">
+              {{ session.type === 'work' ? '🍅' : '☕' }}
+            </span>
+
+            <span class="text-sm font-medium text-gray-700">
+              {{ session.type === 'work' ? 'Work' : 'Break' }}
+            </span>
+          </div>
+
+          <div class="text-xs text-gray-400">
+            {{ session.duration }}m · {{ formatTime(session.timestamp) }}
+          </div>
+
         </li>
+
       </ul>
     </div>
 
-    <!-- Clear History -->
-    <button v-if="history.length > 0" class="clear-btn" @click="$emit('clear-history')">
+    <button v-if="history.length > 0" class="w-full mt-5 py-2 rounded-lg border text-sm text-gray-500 hover:text-indigo-500 hover:border-indigo-300 transition" @click="$emit('clear-history')" >
       Clear History
     </button>
+
   </div>
 </template>
 
@@ -142,204 +170,3 @@ const formatTime = (isoString) => {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 </script>
-
-<style scoped>
-.stats-container {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #1a1a2e;
-  border-radius: 16px;
-  color: #eee;
-}
-
-.stats-title {
-  text-align: center;
-  font-size: 1.4rem;
-  margin-bottom: 16px;
-  color: #ff4757;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-/* Summary Cards */
-.summary-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  background: #16213e;
-  border-radius: 12px;
-  padding: 16px 12px;
-  text-align: center;
-  border: 1px solid #0f3460;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.stat-card.accent {
-  background: #0f3460;
-  border-color: #ff4757;
-}
-
-.stat-value {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #ff4757;
-  line-height: 1;
-}
-
-.stat-value small {
-  font-size: 1rem;
-  font-weight: 400;
-}
-
-.stat-label {
-  font-size: 0.75rem;
-  color: #aaa;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Filter Tabs */
-.filter-tabs {
-  display: flex;
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 12px;
-  border: 1px solid #0f3460;
-}
-
-.filter-tabs button {
-  flex: 1;
-  padding: 8px;
-  background: #16213e;
-  color: #aaa;
-  border: none;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s;
-}
-
-.filter-tabs button.active {
-  background: #ff4757;
-  color: white;
-  font-weight: 600;
-}
-
-/* Filtered Stats */
-.filtered-stats {
-  background: #16213e;
-  border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  border: 1px solid #0f3460;
-}
-
-.filtered-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 0;
-  font-size: 0.9rem;
-  color: #ccc;
-  border-bottom: 1px solid #0f3460;
-}
-
-.filtered-row:last-child {
-  border-bottom: none;
-}
-
-.filtered-row strong {
-  color: #ff4757;
-}
-
-/* History Section */
-.history-section h3 {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #aaa;
-  margin-bottom: 10px;
-}
-
-.empty-state {
-  text-align: center;
-  color: #555;
-  font-size: 0.9rem;
-  padding: 20px 0;
-}
-
-.history-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.history-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-}
-
-.history-item.work {
-  background: rgba(255, 71, 87, 0.1);
-  border-left: 3px solid #ff4757;
-}
-
-.history-item.break {
-  background: rgba(46, 213, 115, 0.1);
-  border-left: 3px solid #2ed573;
-}
-
-.session-badge { font-size: 1rem; }
-
-.session-type {
-  flex: 1;
-  font-weight: 600;
-  color: #eee;
-}
-
-.session-duration {
-  color: #aaa;
-  font-size: 0.8rem;
-}
-
-.session-time {
-  color: #666;
-  font-size: 0.75rem;
-  min-width: 48px;
-  text-align: right;
-}
-
-/* Clear button */
-.clear-btn {
-  display: block;
-  width: 100%;
-  margin-top: 16px;
-  padding: 8px;
-  background: transparent;
-  border: 1px solid #333;
-  border-radius: 8px;
-  color: #555;
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.2s;
-}
-
-.clear-btn:hover {
-  border-color: #ff4757;
-  color: #ff4757;
-}
-</style>

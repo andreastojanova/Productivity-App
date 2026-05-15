@@ -1,53 +1,50 @@
 <template>
-  <div class="pomodoro-card">
-    <div class="preset-selector">
-      <p>Choose your session type:</p>
-      <button
-          v-for="(preset, index) in presets"
-          :key="index"
-          :class="['preset-btn', { active: selectedPresetIndex === index }]"
-          @click="selectPreset(index)"
-      >
-        {{ preset.work }}/{{ preset.shortBreak }} min
-      </button>
+  <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6">
+
+    <div class="mb-5">
+      <p class="text-sm text-gray-500 mb-3">Choose your session type:</p>
+
+      <div class="flex flex-wrap gap-2">
+        <button v-for="(preset, index) in presets" :key="index" @click="selectPreset(index)" class="px-3 py-2 rounded-lg text-sm border transition" :class="selectedPresetIndex === index ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-gray-100 text-gray-600 border-gray-200'" >
+          {{ preset.work }}/{{ preset.shortBreak }} min
+        </button>
+      </div>
     </div>
 
-    <hr />
-
-    <div class="mode-buttons">
-      <button
-          :class="['mode-btn', { active: mode === 'work' }]"
-          @click="changeMode('work')"
-      >
+    <div class="flex gap-2 mb-6">
+      <button @click="changeMode('work')" class="flex-1 py-2 rounded-lg border text-sm transition" :class="mode === 'work' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-gray-100 text-gray-500'" >
         Work
       </button>
-      <button
-          :class="['mode-btn', { active: mode === 'shortBreak' }]"
-          @click="changeMode('shortBreak')"
-      >
-        Short Break
+
+      <button @click="changeMode('shortBreak')" class="flex-1 py-2 rounded-lg border text-sm transition" :class="mode === 'shortBreak' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-gray-100 text-gray-500'" >
+        Break
       </button>
-      <button
-          :class="['mode-btn', { active: mode === 'longBreak' }]"
-          @click="changeMode('longBreak')"
-      >
-        Long Break
+
+      <button @click="changeMode('longBreak')" class="flex-1 py-2 rounded-lg border text-sm transition" :class="mode === 'longBreak' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-gray-100 text-gray-500'">
+        Long
       </button>
     </div>
 
-    <div class="timer-display">
-      <div class="time-text">{{ displayTime }}</div>
-      <div class="status-badge">{{ isRunning ? 'FOCUSING...' : 'PAUSED' }}</div>
+    <div class="text-center">
+      <h1 class="text-6xl font-bold text-gray-800 mb-2">
+        {{ displayTime }}
+      </h1>
+
+      <span class="inline-block px-4 py-1 rounded-full text-xs font-semibold tracking-widest" :class="isRunning ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'" >
+        {{ isRunning ? 'FOCUSING...' : 'PAUSED' }}
+      </span>
     </div>
 
-    <div class="controls">
-      <button class="btn-primary" @click="toggleTimer">
+    <div class="flex gap-3 mt-8">
+      <button @click="toggleTimer" class="flex-1 py-3 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition">
         {{ isRunning ? 'PAUSE' : 'START' }}
       </button>
-      <button class="btn-secondary" @click="resetTimer">
+
+      <button @click="resetTimer" class="flex-1 py-3 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
         RESET
       </button>
     </div>
+
   </div>
 </template>
 
@@ -55,7 +52,6 @@
 import { ref, computed, onUnmounted } from 'vue';
 
 const emit = defineEmits(['session-completed']);
-
 
 const presets = [
   { work: 25, shortBreak: 5, longBreak: 15 },
@@ -145,75 +141,3 @@ const finishSession = () => {
 
 onUnmounted(() => pauseTimer());
 </script>
-
-<style scoped>
-.pomodoro-card {
-  text-align: center;
-  padding: 2rem;
-  border-radius: 20px;
-  background: white;
-  color: #333;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.preset-selector {
-  margin-bottom: 20px;
-}
-
-.preset-btn {
-  margin: 5px;
-  padding: 8px 15px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  cursor: pointer;
-  background: transparent;
-}
-
-.preset-btn.active {
-  background: #333;
-  color: white;
-  border-color: #333;
-}
-
-.mode-buttons {
-  margin: 20px 0;
-}
-
-.mode-btn {
-  padding: 10px 20px;
-  border: none;
-  background: #eee;
-  cursor: pointer;
-  margin: 0 5px;
-  border-radius: 5px;
-}
-
-.mode-btn.active {
-  background: #ff5f5f;
-  color: white;
-}
-
-.time-text {
-  font-size: 5rem;
-  font-weight: bold;
-}
-
-.btn-primary {
-  padding: 15px 40px;
-  font-size: 1.2rem;
-  background: #ff5f5f;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-right: 10px;
-}
-
-.btn-secondary {
-  padding: 15px 20px;
-  background: #ccc;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-</style>
