@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from 'vue';
+import { ref, computed, onUnmounted, onMounted } from 'vue';
 
 const emit = defineEmits(['session-completed']);
 
@@ -57,7 +57,7 @@ const presets = [
   { work: 25, shortBreak: 5, longBreak: 15 },
   { work: 30, shortBreak: 10, longBreak: 20 },
   { work: 50, shortBreak: 10, longBreak: 30 },
-  { work: 5, shortBreak: 1, longBreak: 2 } // За тестирање (брз режим)
+  { work: 5, shortBreak: 1, longBreak: 2 }
 ];
 
 const selectedPresetIndex = ref(0);
