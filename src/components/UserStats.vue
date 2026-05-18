@@ -71,7 +71,6 @@ const props = defineProps({
     default: () => [],
   },
 });
-const emit = defineEmits(['clear-history']);
 
 
 const totalSessions = computed(() => props.history.length);

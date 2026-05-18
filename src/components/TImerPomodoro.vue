@@ -1,78 +1,82 @@
 <template>
-  <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6">
-
-    <div class="mb-5">
-      <p class="text-sm text-gray-500 mb-3">Choose your session type:</p>
-
-      <div class="flex flex-wrap gap-2">
-        <button v-for="(preset, index) in presets" :key="index" @click="selectPreset(index)" class="px-3 py-2 rounded-lg text-sm border transition" :class="selectedPresetIndex === index ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-gray-100 text-gray-600 border-gray-200'" >
-          {{ preset.work }}/{{ preset.shortBreak }} min
-        </button>
-      </div>
+  <div
+      class="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-8 text-center"
+  >
+    <!-- PRESETS -->
+    <div class="flex gap-3 justify-center mb-6 flex-wrap">
+      <button
+          v-for="(preset, index) in presets"
+          :key="index"
+          @click="selectPreset(index)"
+          class="px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-300"
+          :class="
+          selectedPresetIndex === index
+            ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-200'
+            : 'bg-white text-slate-600 border border-slate-200 hover:border-indigo-300'
+        "
+      >
+        {{ preset.label }}
+      </button>
     </div>
 
-    <div class="flex gap-2 mb-6">
-      <button @click="changeMode('work')" class="flex-1 py-2 rounded-lg border text-sm transition" :class="mode === 'work' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-gray-100 text-gray-500'" >
-        Work
-      </button>
-
-      <button @click="changeMode('shortBreak')" class="flex-1 py-2 rounded-lg border text-sm transition" :class="mode === 'shortBreak' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-gray-100 text-gray-500'" >
+    <!-- MODE -->
+    <div class="flex justify-center gap-4 text-sm mb-8">
+      <span :class="mode === 'work' ? 'text-indigo-600 font-semibold' : 'text-slate-400'">
+        Focus
+      </span>
+      <span class="text-slate-300">•</span>
+      <span :class="mode === 'shortBreak' ? 'text-emerald-500 font-semibold' : 'text-slate-400'">
         Break
-      </button>
-
-      <button @click="changeMode('longBreak')" class="flex-1 py-2 rounded-lg border text-sm transition" :class="mode === 'longBreak' ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-gray-100 text-gray-500'">
-        Long
-      </button>
-    </div>
-
-    <div class="text-center">
-      <h1 class="text-6xl font-bold text-gray-800 mb-2">
-        {{ displayTime }}
-      </h1>
-
-      <span class="inline-block px-4 py-1 rounded-full text-xs font-semibold tracking-widest" :class="isRunning ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'" >
-        {{ isRunning ? 'FOCUSING...' : 'PAUSED' }}
       </span>
     </div>
 
-    <div class="flex gap-3 mt-8">
-      <button @click="toggleTimer" class="flex-1 py-3 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 transition">
+    <!-- TIMER -->
+    <div class="mb-8">
+      <div class="text-7xl font-bold tracking-tight text-slate-800 mb-3">
+        {{ displayTime }}
+      </div>
+      <div
+          class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
+          :class="isRunning ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-500'"
+      >
+        {{ isRunning ? 'Currently focusing...' : 'Ready to focus' }}
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="flex gap-4 justify-center">
+      <button
+          @click="toggleTimer"
+          class="px-8 py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-semibold transition-all duration-300 hover:scale-105 shadow-lg shadow-indigo-200"
+      >
         {{ isRunning ? 'PAUSE' : 'START' }}
       </button>
-
-      <button @click="resetTimer" class="flex-1 py-3 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+      <button
+          @click="resetTimer"
+          class="px-8 py-4 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold transition-all duration-300"
+      >
         RESET
       </button>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted, onMounted } from 'vue';
+import { ref, computed, onUnmounted } from 'vue';
 
 const emit = defineEmits(['session-completed']);
 
 const presets = [
-  { work: 25, shortBreak: 5, longBreak: 15 },
-  { work: 30, shortBreak: 10, longBreak: 20 },
-  { work: 50, shortBreak: 10, longBreak: 30 },
-  { work: 5, shortBreak: 1, longBreak: 2 }
+  { label: "🍅 Classic",   work: 25, shortBreak: 5  },
+  { label: "⚡ Deep Work", work: 50, shortBreak: 10 },
+  { label: "📚 Study",     work: 30, shortBreak: 10 },
 ];
 
 const selectedPresetIndex = ref(0);
 const mode = ref('work');
 const isRunning = ref(false);
+const timeLeft = ref(3); // TODO: revert to presets[0].work * 60
 let timerInterval = null;
-
-
-const currentDuration = computed(() => {
-  const preset = presets[selectedPresetIndex.value];
-  return preset[mode.value] * 60;
-});
-
-const timeLeft = ref(currentDuration.value);
-
 
 const displayTime = computed(() => {
   const minutes = Math.floor(timeLeft.value / 60);
@@ -80,25 +84,9 @@ const displayTime = computed(() => {
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 });
 
-
-const selectPreset = (index) => {
-  if (isRunning.value && !confirm("Session in progress. Switch preset?")) return;
-  selectedPresetIndex.value = index;
-  resetTimer();
-};
-
-const changeMode = (newMode) => {
-  if (isRunning.value && !confirm("Switch mode and reset timer?")) return;
-  mode.value = newMode;
-  resetTimer();
-};
-
 const toggleTimer = () => {
-  if (isRunning.value) {
-    pauseTimer();
-  } else {
-    startTimer();
-  }
+  if (isRunning.value) pauseTimer();
+  else startTimer();
 };
 
 const startTimer = () => {
@@ -120,22 +108,33 @@ const pauseTimer = () => {
 
 const resetTimer = () => {
   pauseTimer();
-  timeLeft.value = currentDuration.value;
+  mode.value = 'work';
+  timeLeft.value = presets[selectedPresetIndex.value].work * 60;
 };
 
 const finishSession = () => {
   pauseTimer();
-  const alarm = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-  alarm.play().catch(() => {});
 
   emit('session-completed', {
     type: mode.value,
-    duration: currentDuration.value / 60,
-    preset: `${presets[selectedPresetIndex.value].work}/${presets[selectedPresetIndex.value].shortBreak}`,
+    duration: presets[selectedPresetIndex.value][mode.value],
     timestamp: new Date().toISOString()
   });
 
-  alert(`Time is up! ${mode.value.toUpperCase()} session finished.`);
+  if (mode.value === 'work') {
+    mode.value = 'shortBreak';
+    alert("Focus session completed! ☕");
+  } else {
+    mode.value = 'work';
+    alert("Break finished! 🍅");
+  }
+
+  timeLeft.value = 5; // TODO: revert to presets[selectedPresetIndex.value][mode.value] * 60
+  startTimer();
+};
+
+const selectPreset = (index) => {
+  selectedPresetIndex.value = index;
   resetTimer();
 };
 
