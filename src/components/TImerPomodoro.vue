@@ -1,6 +1,6 @@
 <template>
   <div
-      class="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-8 text-center"
+      class="w-full h-full bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-8 text-center"
   >
     <!-- PRESETS -->
     <div class="flex gap-3 justify-center mb-6 flex-wrap">

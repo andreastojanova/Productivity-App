@@ -2,7 +2,7 @@ UserStats.vue
 
 <template>
   <div
-      class="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-6"
+      class="w-full h-full bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-6"
   >
     <h2 class="text-xl font-bold text-slate-800 mb-6 text-center">
       Session Stats
