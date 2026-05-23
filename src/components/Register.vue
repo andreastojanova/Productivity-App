@@ -54,6 +54,10 @@
           </span>
         </p>
 
+        <p v-if="errorMessage" class="text-red-500 text-sm px-1">
+          {{ errorMessage }}
+        </p>
+
       </div>
     </div>
 
@@ -69,12 +73,19 @@ const router = useRouter()
 
 const email = ref('')
 const password = ref('')
+const errorMessage = ref('');
 
 const register = async () => {
+  errorMessage.value = '';
   const { data, error } = await supabase.auth.signUp({
     email: email.value,
     password: password.value
   })
+
+  if (error) {
+    errorMessage.value = error.message;
+    return;
+  }
 
   console.log('REGISTER DATA:', data)
   console.log('REGISTER ERROR:', error)

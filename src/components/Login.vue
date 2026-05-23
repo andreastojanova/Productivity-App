@@ -1,4 +1,3 @@
-import './style.css'
 
 <template>
   <div class="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -45,6 +44,10 @@ import './style.css'
           Login
         </button>
 
+        <p v-if="errorMessage" class="text-red-500 text-sm px-1">
+          {{ errorMessage }}
+        </p>
+
       </div>
     </div>
 
@@ -60,18 +63,27 @@ const router = useRouter()
 
 const email = ref('')
 const password = ref('')
+const errorMessage = ref('');
 
 const login = async () => {
+  errorMessage.value = '';
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email.value,
     password: password.value
   })
 
+  if (error) {
+    errorMessage.value = error.message;
+    return;
+  }
+
+
   console.log('LOGIN DATA:', data)
   console.log('LOGIN ERROR:', error)
 
   if (data?.user) {
-    router.push('/')
+    router.push('/');
   }
 }
 </script>
